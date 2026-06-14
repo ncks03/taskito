@@ -10,6 +10,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 import java.net.URI;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -26,14 +27,25 @@ public class TaskResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAllTasks() {
-        List<Task> tasks = controller.getTasks();
+    public Response getAllTasks(@QueryParam("limit") Optional<Integer> limit) {
+        List<TaskResponseDTO> tasks;
+
+        tasks = limit.map(intLimit -> controller.getTasks().stream()
+                .map(TaskResponseDTO::fromTask)
+                .sorted(Comparator.comparing(TaskResponseDTO::dateCreated))
+                .limit(intLimit)
+                .toList()
+        ).orElseGet(() -> controller.getTasks().stream()
+                .map(TaskResponseDTO::fromTask)
+                .sorted(Comparator.comparing(TaskResponseDTO::dateCreated))
+                .toList()
+        );
 
         if (tasks.isEmpty()) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
 
-        return Response.ok(tasks.stream().map(TaskResponseDTO::fromTask).toList()).build();
+        return Response.ok(tasks).build();
     }
 
     @GET
@@ -53,11 +65,11 @@ public class TaskResource {
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response addTask(TaskPostDTO task) {
-        Task newTask = new Task(task.description());
+    public Response addTasks(List<TaskPostDTO> tasks) {
+        tasks.forEach(task -> {
+            controller.addTask(new Task(task.description()));
+        });
 
-        controller.addTask(newTask);
-
-        return Response.created(URI.create("/tasks/" + newTask.getId())).build();
+        return Response.created(URI.create("/tasks")).build();
     }
 }
