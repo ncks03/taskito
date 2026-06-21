@@ -9,11 +9,16 @@ public class Task {
     private String description;
     private boolean completed;
 
-    public Task(String description) {
+    public Task() {
         this.id = UUID.randomUUID();
         this.dateCreated = new Date();
-        this.description = description;
+        this.description = "";
         this.completed = false;
+    }
+
+    public Task(String description) {
+        this();
+        this.description = description;
     }
 
     public UUID getId() {

@@ -66,10 +66,20 @@ public class TaskResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response addTasks(List<TaskPostDTO> tasks) {
-        tasks.forEach(task -> {
-            controller.addTask(new Task(task.description()));
-        });
+        List<Task> newTasks = tasks.stream()
+                .map(task -> new Task(task.description()))
+                .toList();
+
+        this.controller.addTasks(newTasks);
 
         return Response.created(URI.create("/tasks")).build();
+    }
+
+    @DELETE
+    @Path("/delete")
+    public Response removeTask(@QueryParam("id") UUID id) {
+        this.controller.removeTask(id);
+
+        return Response.noContent().build();
     }
 }
