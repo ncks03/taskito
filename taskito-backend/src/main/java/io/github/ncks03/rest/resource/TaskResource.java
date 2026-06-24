@@ -54,13 +54,31 @@ public class TaskResource {
     public Response getTask(@PathParam("id") UUID id) {
         Optional<Task> found = controller.getTask(id);
 
-        System.out.println(found);
-
         if (found.isEmpty()) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
 
         return Response.ok(TaskResponseDTO.fromTask(found.get())).build();
+    }
+
+    @PUT
+    @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response addTask(@PathParam("id") UUID id, TaskPostDTO dto) {
+        Optional<Task> found = controller.getTask(id);
+
+        if (found.isEmpty()) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        Task task = found.get();
+
+        task.setCompleted(dto.completed());
+        task.setDescription(dto.description());
+
+        this.controller.update();
+
+        return Response.created(URI.create("/tasks/" + task.getId())).build();
     }
 
     @POST

@@ -59,6 +59,11 @@ public class TaskController {
         this.writeTasks();
     }
 
+    public void update() {
+        this.writeTasks();
+        this.readTasks();
+    }
+
     public Optional<Task> getTask(UUID id) {
         return tasks.stream()
                 .filter(task -> task.getId().equals(id))
