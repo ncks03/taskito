@@ -19,8 +19,9 @@ import java.util.logging.Logger;
 @Path("/tasks")
 public class TaskResource {
 
+    private static final Logger logger = Logger.getLogger(TaskResource.class.getName());
+
     private final TaskController controller;
-    private final Logger logger = Logger.getLogger(TaskResource.class.getName());
 
     @Inject
     public TaskResource(TaskController controller) {
@@ -44,6 +45,7 @@ public class TaskResource {
         );
 
         if (tasks.isEmpty()) {
+            logger.fine("Error response: task not found");
             return Response.status(Response.Status.NOT_FOUND).build();
         }
 
@@ -80,6 +82,7 @@ public class TaskResource {
         task.setDescription(dto.description());
 
         this.controller.update();
+        logger.fine("Task updated: " + task);
 
         return Response.created(URI.create("/tasks/" + task.getId())).build();
     }
@@ -92,7 +95,7 @@ public class TaskResource {
                 .toList();
 
         this.controller.addTasks(newTasks);
-
+        logger.fine("Tasks added: " + newTasks);
         return Response.created(URI.create("/tasks")).build();
     }
 
@@ -100,6 +103,7 @@ public class TaskResource {
     @Path("/delete")
     public Response removeTask(@QueryParam("id") UUID id) {
         this.controller.removeTask(id);
+        logger.info("Task with id: " + id + " deleted");
 
         return Response.noContent().build();
     }
