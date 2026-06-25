@@ -1,7 +1,22 @@
-<ul>
-  @for (task of tasks; track task.id) {
-    <li>
-      <p>{{task.description}}</p>
-    </li>
-  }
-</ul>
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Completed</th>
+      <th scope="col">Description</th>
+      <th scope="col">Created</th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (task of tasks; track task.id) {
+      <tr>
+        <td>
+          <input type="checkbox" [checked]="task.completed" (change)="onChecked(task)">
+        </td>
+        <td>
+          <input type="text" value="{{task.description}}">
+        </td>
+        <td>{{task.dateCreated | date}}</td>
+      </tr>
+    }
+  </tbody>
+</table>

@@ -14,11 +14,13 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 @Path("/tasks")
 public class TaskResource {
 
     private final TaskController controller;
+    private final Logger logger = Logger.getLogger(TaskResource.class.getName());
 
     @Inject
     public TaskResource(TaskController controller) {
@@ -57,13 +59,14 @@ public class TaskResource {
         if (found.isEmpty()) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
+        logger.fine("Task found: " + found);
 
         return Response.ok(TaskResponseDTO.fromTask(found.get())).build();
     }
 
     @PUT
     @Path("/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
     public Response addTask(@PathParam("id") UUID id, TaskPostDTO dto) {
         Optional<Task> found = controller.getTask(id);
 
